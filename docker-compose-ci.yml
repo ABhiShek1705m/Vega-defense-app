@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  sql-server:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    restart: always
+    environment:
+      SA_PASSWORD: c335133963661C
+      ACCEPT_EULA: Y
+      MSSQL_PID: Express
+      MSSQL_DATABASE: vega
+    ports:
+      - "1433:1433"
+    networks:
+      - vegaNetwork
+
+  frontend:
+    image: zchen883/vega_front
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - vegaNetwork
+    depends_on:
+      - vega-app
+
+  vega-app:
+    image: zchen883/vega_back
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - sql-server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:sqlserver://sql-server:1433;databaseName=vega;encrypt=true;trustServerCertificate=true;
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: c335133963661C
+      SPRING_PROFILES_ACTIVE: dev,docker
+      BASIC_FOLDER_PATH: /data
+    volumes:
+      - data-volume:/data
+    networks:
+      - vegaNetwork
+
+volumes:
+  data-volume:
+
+networks:
+  vegaNetwork:
+    driver: bridge

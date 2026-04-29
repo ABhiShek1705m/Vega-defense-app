@@ -1,0 +1,71 @@
+stages:
+  - test
+  - build
+  - docker
+
+variables:
+  DOCKER_DRIVER: overlay2
+
+# ------------------------
+# Backend Test
+# ------------------------
+backend_test:
+  stage: test
+  image: maven:3.9.6-eclipse-temurin-17
+  script:
+    - cd vega-spring
+    - mvn clean test
+  artifacts:
+    when: always
+    reports:
+      junit: vega-spring/target/surefire-reports/*.xml
+  only:
+    - main
+    - merge_requests
+
+# ------------------------
+# Backend Build
+# ------------------------
+backend_build:
+  stage: build
+  image: maven:3.9.6-eclipse-temurin-17
+  script:
+    - cd vega-spring
+    - mvn clean package -DskipTests
+  artifacts:
+    paths:
+      - vega-spring/target/*.jar
+  only:
+    - main
+
+# ------------------------
+# Frontend Build
+# ------------------------
+frontend_build:
+  stage: build
+  image: node:16
+  script:
+    - cd vega-web
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - vega-web/build/
+  only:
+    - main
+
+# ------------------------
+# Docker Build & Push
+# ------------------------
+docker_build:
+  stage: docker
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u $REGISTRY_USER -p $REGISTRY_PASS
+  script:
+    - docker build -t zchen883/ucrypt_back:latest vega-spring
+    - docker push zchen883/ucrypt_back:latest
+    - docker build -t zchen883/ucrypt_front:latest vega-web
+    - docker push zchen883/ucrypt_front:latest
