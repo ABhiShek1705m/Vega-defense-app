@@ -49,7 +49,7 @@ docker_build:
   before_script:
     - echo "$REGISTRY_PASS" | docker login -u "$REGISTRY_USER" --password-stdin
   script:
-    - docker build -t username/docker_repository_back:latest vega-spring
-    - docker push username/docker_repository_back:latest
-    - docker build -t username/docker_repository_front:latest vega-web
-    - docker push username/docker_repository_front:latest
+    - docker build -t eafolaranmi/vega_back:latest vega-spring
+    - docker push eafolaranmi/vega_back:latest
+    - docker build -t eafolaranmi/vega_front:latest vega-web
+    - docker push eafolaranmi/vega_front:latest
