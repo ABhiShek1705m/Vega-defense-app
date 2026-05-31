@@ -13,7 +13,7 @@ services:
       - vegaNetwork
 
   frontend:
-    image: username/vega_front
+    image: eafolaranmi/vega_front
     restart: always
     ports:
       - "80:3000"
@@ -23,7 +23,7 @@ services:
       - vega-spring
 
   vega-spring:
-    image: username/vega_back
+    image: eafolaranmi/vega_back
     restart: always
     ports:
       - "8080:8080"
