@@ -11,7 +11,7 @@ public class HomePage extends PageBase {
 
    // This defines a locators for a Elements in a webpage.
     By signUpBtn = By.linkText("Sign Up");
-    By loginBtn = By.linkText("Login");
+    public By loginBtn = By.linkText("Login");
     By nameField = By.name("name");
     By emailField = By.name("email");
     By passField = By.name("password");
