@@ -58,10 +58,6 @@ public class HomePage extends PageBase {
         js.executeScript("arguments[0].scrollIntoView({block:'center'});", webElement);
         js.executeScript("arguments[0].click();", webElement);
         webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(loginBtn));
-        webDriverWait.until(driver -> {
-            js.executeScript("window.scrollTo(0, 0);");
-            Number scrollY = (Number) js.executeScript("return window.pageYOffset;");
-            return scrollY.longValue() == 0L;
-        });
+        js.executeScript("window.scrollTo(0, 0);");
     }
 }
