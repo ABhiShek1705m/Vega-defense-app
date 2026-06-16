@@ -60,5 +60,10 @@ public class TestBase {
         softAssert.assertEquals(el.getText(), expected);
     }
 
+    public void assertElementNotPresent(By by) {
+        WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
+        boolean absent = wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
+        softAssert.assertTrue(absent, "Expected element to not be present: " + by.toString());
+    }
 
 }

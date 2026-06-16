@@ -2,6 +2,7 @@ package org.vega.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class HomePage extends PageBase {
     public HomePage(WebDriver webDriver) {
@@ -22,6 +23,9 @@ public class HomePage extends PageBase {
    By passwordLoginField=By.name("password");
    By loginSubmitBtn=By.xpath("//button[text()='Login']");
    By adminPanelModule=By.linkText("Admin");
+   public By adminNavLink = By.linkText("Admin");
+   public By resourcesNavLink = By.linkText("Resources");
+   By logoutBtn = By.linkText("Logout");
 
 
     //Method to sign up a user with the provided information.
@@ -46,5 +50,14 @@ public class HomePage extends PageBase {
 
     public void openAdminPanel(){
         click(adminPanelModule);
+    }
+
+    public void logout() {
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(logoutBtn));
+        webElement = webDriver.findElement(logoutBtn);
+        js.executeScript("arguments[0].scrollIntoView({block:'center'});", webElement);
+        js.executeScript("arguments[0].click();", webElement);
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(loginBtn));
+        js.executeScript("window.scrollTo(0, 0);");
     }
 }

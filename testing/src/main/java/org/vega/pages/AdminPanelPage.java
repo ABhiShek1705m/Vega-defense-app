@@ -2,6 +2,7 @@ package org.vega.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class AdminPanelPage extends PageBase {
     public AdminPanelPage(WebDriver webDriver) {
@@ -15,6 +16,7 @@ public class AdminPanelPage extends PageBase {
     By approve = By.cssSelector("tbody tr:nth-child(1) td:nth-child(5) div:nth-child(1) button:nth-child(1)");
     By staffAccountsTab = By.cssSelector("div[class='col-md-9'] button:nth-child(2)");
     By btnUpdateRoleStaff = By.cssSelector("tbody tr:nth-child(1) td:nth-child(3) select:nth-child(1)");
+    By allAccountsTab = By.xpath("//button[contains(text(), 'All Accounts')]");
 
     public void approveSignUpRequest() {
         click(approve);
@@ -24,6 +26,14 @@ public class AdminPanelPage extends PageBase {
         click(staffAccountsTab);
         click(btnUpdateRoleStaff);
         select(btnUpdateRoleStaff, newRole);
+    }
+
+    public void updateRoleForUserInAllAccounts(String email, String newRole) {
+        click(allAccountsTab);
+        By emailCell = By.xpath("//td[normalize-space()='" + email + "']");
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(emailCell));
+        By roleSelect = By.xpath("//td[normalize-space()='" + email + "']/following-sibling::td[2]//select");
+        select(roleSelect, newRole);
     }
 
 }
