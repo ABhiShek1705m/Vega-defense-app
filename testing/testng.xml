@@ -6,6 +6,7 @@
             <class name="tests.SignUpTest"></class>
             <class name="tests.AdminPanelTest"></class>
             <class name="tests.RoleManagementTest"></class>
+            <class name="tests.FileUploadVisibilityTest"></class>
         </classes>
     </test><!-- Test -->
 </suite><!-- Test -->

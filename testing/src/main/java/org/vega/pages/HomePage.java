@@ -52,6 +52,10 @@ public class HomePage extends PageBase {
         click(adminPanelModule);
     }
 
+    public void openResources(){
+        click(resourcesNavLink);
+    }
+
     public void logout() {
         webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(logoutBtn));
         webElement = webDriver.findElement(logoutBtn);

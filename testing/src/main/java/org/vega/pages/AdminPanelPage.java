@@ -18,6 +18,11 @@ public class AdminPanelPage extends PageBase {
     By btnUpdateRoleStaff = By.cssSelector("tbody tr:nth-child(1) td:nth-child(3) select:nth-child(1)");
     By allAccountsTab = By.xpath("//button[contains(text(), 'All Accounts')]"); // Navigate to all accounts tab in the admin panel
 
+    // Resources Upload sidebar and form locators
+    By resourcesUploadSidebarBtn = By.xpath("//button[contains(text(), 'Resources Upload')]");
+    public By selectFileLabel = By.cssSelector("label[for='file-upload']");
+    By fileInput = By.id("file-upload");
+
     public void approveSignUpRequest() {
         click(approve);
     }
@@ -27,6 +32,15 @@ public class AdminPanelPage extends PageBase {
         click(btnUpdateRoleStaff);
         select(btnUpdateRoleStaff, newRole);
     }
+    public void clickResourcesUpload() {
+        click(resourcesUploadSidebarBtn);
+    }
+
+    public void uploadFile(String absoluteFilePath) {
+        webElement = webDriver.findElement(fileInput);
+        webElement.sendKeys(absoluteFilePath);
+    }
+
     // Update account role in the all accounts tab in the admin panel
     public void updateRoleForUserInAllAccounts(String email, String newRole) {
         click(allAccountsTab);

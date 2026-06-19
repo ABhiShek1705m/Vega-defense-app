@@ -75,28 +75,6 @@ public class RoleManagementTest extends TestBase {
 
     // F2
     @Test(priority = 2)
-    public void employeeRoleCanSeeResourcesButNotAdminTab() {
-        homePage = new HomePage(webDriver);
-        adminPanelPage = new AdminPanelPage(webDriver);
-
-        // Admin changes empEmail from User → Employee.
-        homePage.login(ADMIN_EMAIL, ADMIN_PASSWORD);
-        homePage.openAdminPanel();
-        assertIsEqual(adminPanelPage.adminPanelTitle, "ADMIN PANEL");
-        adminPanelPage.updateRoleForUserInAllAccounts(empEmail, "Employee");
-        assertIsEqual(homePage.toastMsg, "Role updated successfully");
-        homePage.logout();
-
-        // empEmail (now Employee) should see Resources but not Admin.
-        homePage.login(empEmail, empPassword);
-        assertElementNotPresent(homePage.adminNavLink);
-        assertIsEqual(homePage.resourcesNavLink, "Resources");
-        homePage.logout();
-        softAssert.assertAll();
-    }
-
-    // F2
-    @Test(priority = 3)
     public void userRoleCannotSeeResourcesOrAdminTab() {
         homePage = new HomePage(webDriver);
         adminPanelPage = new AdminPanelPage(webDriver);
@@ -118,5 +96,29 @@ public class RoleManagementTest extends TestBase {
         assertElementNotPresent(homePage.resourcesNavLink);
         homePage.logout();
         softAssert.assertAll();
+    }   
+    
+    
+    // F2
+    @Test(priority = 3)
+    public void employeeRoleCanSeeResourcesButNotAdminTab() {
+        homePage = new HomePage(webDriver);
+        adminPanelPage = new AdminPanelPage(webDriver);
+
+        // Admin changes empEmail from User → Employee.
+        homePage.login(ADMIN_EMAIL, ADMIN_PASSWORD);
+        homePage.openAdminPanel();
+        assertIsEqual(adminPanelPage.adminPanelTitle, "ADMIN PANEL");
+        adminPanelPage.updateRoleForUserInAllAccounts(empEmail, "Employee");
+        assertIsEqual(homePage.toastMsg, "Role updated successfully");
+        homePage.logout();
+
+        // empEmail (now Employee) should see Resources but not Admin.
+        homePage.login(empEmail, empPassword);
+        assertElementNotPresent(homePage.adminNavLink);
+        assertIsEqual(homePage.resourcesNavLink, "Resources");
+        homePage.logout();
+        softAssert.assertAll();
     }
+
 }
