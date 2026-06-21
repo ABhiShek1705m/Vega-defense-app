@@ -56,27 +56,16 @@ public class DefenseAppTest extends TestBase {
     // 1. Defense Dashboard visibility – unauthenticated user
     // ----------------------------------------------------------------
 
-    /**
-     * FOUND BUG: The /DefenseAppDashboard route is not protected.
-     * Unauthenticated users can access it directly and see dashboard headings.
-     * Expected behavior: unauthenticated users should be redirected to login.
-     * This test documents the current (buggy) behavior and will be updated
-     * once the bug is fixed in Task II for Lab Part 3.
-     */
-
     @Test(priority = 0)
-    public void unauthenticatedUserCanAccessDefenseDashboardBug() {
+    public void shouldNotSeeDefenseDashboardWhenNotLoggedIn() {
         webDriver.navigate().to(LoadProperties.env.getProperty("URL") + "/DefenseAppDashboard");
 
-        int clientDashboardHeadings = webDriver.findElements(
-            By.xpath("//h3[normalize-space()='Defense Client Dashboard']")
-        ).size();
+        boolean isRedirected = new org.openqa.selenium.support.ui.WebDriverWait(webDriver, java.time.Duration.ofSeconds(5))
+            .until(driver -> driver.getCurrentUrl().contains("/Login"));
 
-        // BUG: This should be 0 (unauthenticated users should be redirected).
-        // Currently the route is unprotected and renders the dashboard headings.
         sa.assertTrue(
-            clientDashboardHeadings > 0,
-            "BUG: Unauthenticated users can access /DefenseAppDashboard — route is unprotected"
+            isRedirected,
+            "Unauthenticated user should be redirected to /Login"
         );
         sa.assertAll();
     }
