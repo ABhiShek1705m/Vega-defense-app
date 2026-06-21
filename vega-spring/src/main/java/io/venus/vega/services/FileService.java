@@ -54,6 +54,7 @@ public class FileService {
 
         try {
             final var rootLocation = Paths.get(this.FILES_BASIC_FOLDER_PATH);
+            Files.createDirectories(rootLocation);
             final var uniqueNameForFile =  Paths.get(file.getOriginalFilename()).getFileName().toString();
 
             final Path destinationFile = rootLocation.resolve(
@@ -107,7 +108,7 @@ public class FileService {
      * @throws BusinessException 500 if the file couldn't be retrieved from the system;
      * @return the saved file.
      */
-//    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+   @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public DownloadFileDto downloadFile(final String filePath) {
         final var rootLocation = Paths.get(this.FILES_BASIC_FOLDER_PATH);
 
