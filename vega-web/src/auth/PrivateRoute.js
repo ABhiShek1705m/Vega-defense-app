@@ -21,10 +21,11 @@ const PrivateRoute = ({ component: Component, roles, ...rest }) => {
       {...rest}
       render={(props) => {
         if (!isLoggedIn) {
+            // Not logged in
           return <Redirect to="/Login" />;
         }
         if (!hasRequiredRole) {
-          // Logged in but wrong role — send back to home rather than login
+          // Logged in but wrong role, send back to home rather than login
           return <Redirect to="/" />;
         }
         return <Component {...props} />;

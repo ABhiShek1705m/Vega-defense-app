@@ -27,6 +27,7 @@ function App() {
         	<Route path="/PlatformInfo" component={PlatformInfo} />
           <Route path="/SignUp" component={signUp} />
         	<Route path="/Login" component={Login} />
+          {/* Protected routes */}
           <PrivateRoute path="/DefenseAppDashboard" component={defenseAppDashboard} />
           <PrivateRoute path="/adminpanel" component={AdminPanel} roles={["ADMIN"]} />
           <PrivateRoute path="/resources" component={Resources} roles={["ADMIN", "EMPLOYEE"]} />
