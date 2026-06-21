@@ -47,4 +47,9 @@ public class HomePage extends PageBase {
     public void openAdminPanel(){
         click(adminPanelModule);
     }
+    By logoutBtn = By.linkText("Logout");
+
+    public void logout() {
+        click(logoutBtn);
+    }
 }
