@@ -12,6 +12,7 @@ import {UserProvider} from './auth/UserProvider.js';
 import contactus from './components/pages/ContactUs.js';
 import signUp from './components/pages/SignUp.js';
 import defenseAppDashboard from './components/pages/DefenseAppDashboard.js';
+import PrivateRoute from './auth/PrivateRoute.js';
 
 
 function App() {
@@ -26,9 +27,9 @@ function App() {
         	<Route path="/PlatformInfo" component={PlatformInfo} />
           <Route path="/SignUp" component={signUp} />
         	<Route path="/Login" component={Login} />
-          <Route path="/DefenseAppDashboard" component={defenseAppDashboard}/>
-          <Route path="/resources" component={Resources} />
-          <Route path="/adminpanel" component={AdminPanel} />
+          <PrivateRoute path="/DefenseAppDashboard" component={defenseAppDashboard} />
+          <PrivateRoute path="/adminpanel" component={AdminPanel} roles={["ADMIN"]} />
+          <PrivateRoute path="/resources" component={Resources} roles={["ADMIN", "EMPLOYEE"]} />
         </Switch>
     </UserProvider>
   );
