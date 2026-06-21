@@ -18,7 +18,7 @@ public abstract class AbstractController {
     protected static final int DEFAULT_PAGE_SIZE = 20;
 
     protected Pageable pageOf(final Integer offset, final Integer limit, final Sort sort) {
-        final var size = limit == null ? DEFAULT_PAGE_SIZE : limit;
+        final var size = limit == null ? 10000 : limit;
         final var page = (offset == null ? 0 : offset) / size;
         return PageRequest.of(page, size, sort);
     }
