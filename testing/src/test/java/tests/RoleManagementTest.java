@@ -2,6 +2,7 @@ package tests;
 
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.vega.configuration.LoadProperties;
 import org.vega.pages.AdminPanelPage;
@@ -25,7 +26,6 @@ import java.time.Duration;
 
     Name: Paul Aguilar – CEO
     Email: paguilar@vega.com
-    Password: X#abcRT
  */
 
 public class RoleManagementTest extends TestBase {
@@ -44,7 +44,7 @@ public class RoleManagementTest extends TestBase {
     // fire and that is acceptable.
     // ─────────────────────────────────────────────────────────────────────────
 
-    @Test(priority = 0)
+    @BeforeClass
     public void setupAccountRoles() {
         homePage = new HomePage(webDriver);
         adminPanelPage = new AdminPanelPage(webDriver);
@@ -56,7 +56,7 @@ public class RoleManagementTest extends TestBase {
     }
 
     // F1
-    @Test(priority = 1)
+    @Test(priority = 0)
     public void adminCanUpdateRoleInAdminPanel() {
         homePage = new HomePage(webDriver);
         adminPanelPage = new AdminPanelPage(webDriver);
@@ -74,13 +74,10 @@ public class RoleManagementTest extends TestBase {
     }
 
     // F2
-    @Test(priority = 2)
+    @Test(priority = 1)
     public void userRoleCannotSeeResourcesOrAdminTab() {
         homePage = new HomePage(webDriver);
         adminPanelPage = new AdminPanelPage(webDriver);
-        // Checking for visibility of login button before clicking to avoid stale element exception.
-        webDriverWait = new WebDriverWait(webDriver, Duration.ofSeconds(5));
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(homePage.loginBtn));
         
         // Admin changes empEmail from Employee → User.
         homePage.login(ADMIN_EMAIL, ADMIN_PASSWORD);
@@ -92,7 +89,7 @@ public class RoleManagementTest extends TestBase {
 
         // empEmail (now User) should see neither Resources nor Admin.
         homePage.login(empEmail, empPassword);
-        assertElementNotPresent(homePage.adminNavLink);
+        assertElementNotPresent(homePage.adminPanelModule);
         assertElementNotPresent(homePage.resourcesNavLink);
         homePage.logout();
         softAssert.assertAll();
@@ -100,7 +97,7 @@ public class RoleManagementTest extends TestBase {
     
     
     // F2
-    @Test(priority = 3)
+    @Test(priority = 2)
     public void employeeRoleCanSeeResourcesButNotAdminTab() {
         homePage = new HomePage(webDriver);
         adminPanelPage = new AdminPanelPage(webDriver);
@@ -115,7 +112,7 @@ public class RoleManagementTest extends TestBase {
 
         // empEmail (now Employee) should see Resources but not Admin.
         homePage.login(empEmail, empPassword);
-        assertElementNotPresent(homePage.adminNavLink);
+        assertElementNotPresent(homePage.adminPanelModule);
         assertIsEqual(homePage.resourcesNavLink, "Resources");
         homePage.logout();
         softAssert.assertAll();

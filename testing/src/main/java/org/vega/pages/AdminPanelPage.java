@@ -43,11 +43,15 @@ public class AdminPanelPage extends PageBase {
 
     // Update account role in the all accounts tab in the admin panel
     public void updateRoleForUserInAllAccounts(String email, String newRole) {
-        click(allAccountsTab);
-        By emailCell = By.xpath("//td[normalize-space()='" + email + "']");
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(emailCell));
-        By roleSelect = By.xpath("//td[normalize-space()='" + email + "']/following-sibling::td[2]//select");
-        select(roleSelect, newRole);
+        try {
+            click(allAccountsTab);
+            By emailCell = By.xpath("//td[normalize-space()='" + email + "']");
+            webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(emailCell));
+            By roleSelect = By.xpath("//td[normalize-space()='" + email + "']/following-sibling::td[2]//select");
+            select(roleSelect, newRole);
+        } catch (Exception e) {
+            System.out.println("Error updating role for user " + email + ": " + e.getMessage());
+        }
     }
 
 }

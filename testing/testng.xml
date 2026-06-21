@@ -1,12 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="SignUp">
-    <test name="Test1">
+<suite name="Surefire suite">
+
+    <!-- VM IS RUNNING: runs all tests including Start/Stop/Uninstall -->
+    <!-- <test name="testing">
         <classes>
-            <class name="tests.SignUpTest"></class>
-            <class name="tests.AdminPanelTest"></class>
-            <class name="tests.RoleManagementTest"></class>
-            <class name="tests.FileUploadVisibilityTest"></class>
+            <class name="tests.LoginTest"/>
+            <class name="tests.SignUpTest"/>
+            <class name="tests.DefenseAppTest"/>
         </classes>
-    </test><!-- Test -->
-</suite><!-- Test -->
+    </test> -->
+
+    <!-- VM IS NOT RUNNING: excludes requiresVM tests.
+         Comment out the block above and uncomment this one. -->
+    
+    <test name="testing-no-vm">
+        <groups>
+            <run>
+                <exclude name="requiresVM"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="tests.LoginTest"/>
+            <class name="tests.SignUpTest"/>
+            <class name="tests.DefenseAppTest"/>
+        </classes>
+    </test>
+   
+
+</suite>

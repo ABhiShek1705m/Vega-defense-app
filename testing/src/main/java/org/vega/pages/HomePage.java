@@ -22,8 +22,7 @@ public class HomePage extends PageBase {
    By emailLoginField=By.name("email");
    By passwordLoginField=By.name("password");
    By loginSubmitBtn=By.xpath("//button[text()='Login']");
-   By adminPanelModule=By.linkText("Admin");
-   public By adminNavLink = By.linkText("Admin");
+   public By adminPanelModule=By.linkText("Admin");
    public By resourcesNavLink = By.linkText("Resources");
    By logoutBtn = By.linkText("Logout");
 
@@ -57,11 +56,6 @@ public class HomePage extends PageBase {
     }
 
     public void logout() {
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(logoutBtn));
-        webElement = webDriver.findElement(logoutBtn);
-        js.executeScript("arguments[0].scrollIntoView({block:'center'});", webElement);
-        js.executeScript("arguments[0].click();", webElement);
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(loginBtn));
-        js.executeScript("window.scrollTo(0, 0);");
+        click(logoutBtn);
     }
 }

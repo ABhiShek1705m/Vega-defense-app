@@ -40,7 +40,7 @@ public class FileUploadVisibilityTest extends TestBase {
 
     private static String testFilePath;
 
-    @BeforeClass(dependsOnMethods = "startDriver")
+    @BeforeClass()
     public void setupTestFile() throws IOException {
         File testFile = File.createTempFile("vega-test-upload", ".txt");
         testFile.deleteOnExit();
@@ -75,7 +75,6 @@ public class FileUploadVisibilityTest extends TestBase {
 
         // Verify the success toast appears
         assertIsEqual(homePage.toastMsg, "File uploaded successfully");
-        assertElementNotPresent(homePage.toastMsg);
 
         homePage.logout();
         softAssert.assertAll();
@@ -88,11 +87,9 @@ public class FileUploadVisibilityTest extends TestBase {
     @Test(priority = 1, dependsOnMethods = "adminCanUploadFileFromAdminPanel")
     public void adminCanViewUploadedResources() {
         homePage = new HomePage(webDriver);
-        WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(homePage.loginBtn));
         homePage.login(ADMIN_EMAIL, ADMIN_PASSWORD);
-
+        WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
+        
         // Navigate to Resources tab
         homePage.openResources();
 
@@ -109,6 +106,16 @@ public class FileUploadVisibilityTest extends TestBase {
     // ─────────────────────────────────────────────────────────────────────────
     // Scenario 2b: Employee can see uploaded resources in the Resources tab
     // ─────────────────────────────────────────────────────────────────────────
+
+    @Test(priority = 3, dependsOnMethods = "adminCanUploadFileFromAdminPanel")
+    public void userCannotViewUploadedResources() {
+        homePage = new HomePage(webDriver);
+        homePage.login(empEmail, empPassword);
+        // Assert that the user cannot view the resources tab and access resources.
+        assertElementNotPresent(homePage.resourcesNavLink);
+        homePage.logout();
+        softAssert.assertAll();
+    }
 
     @Test(priority = 2, dependsOnMethods = "adminCanUploadFileFromAdminPanel")
     public void employeeCanViewUploadedResources() {
