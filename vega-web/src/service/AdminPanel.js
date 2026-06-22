@@ -22,7 +22,7 @@ export function createFile(file, token) {
   return doPostFile(`${BASE_API_URL}/files`, token, file);
 }
 
-export function downloadFile(filePath) {
+export function downloadFile(filePath, token) {
   const encodedPath = encodeURIComponent(filePath);
-  return doGetDownload(`${BASE_API_URL}/files/download?filePath=${encodedPath}`);
+  return doGetDownload(`${BASE_API_URL}/files/download?filePath=${encodedPath}`, token);
 }
