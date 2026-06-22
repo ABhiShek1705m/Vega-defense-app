@@ -5,6 +5,7 @@ default:
 stages:
   - build
   - docker
+  - test
 
 variables:
   DOCKER_DRIVER: overlay2
@@ -53,6 +54,8 @@ docker_build:
     - docker push eafolaranmi/vega_back:latest
     - docker build -t eafolaranmi/vega_front:latest vega-web
     - docker push eafolaranmi/vega_front:latest
+  only:
+    - main
 
 # ------------------------
 # Nightly Selenium Tests
