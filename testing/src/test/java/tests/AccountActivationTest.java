@@ -120,4 +120,26 @@ public class AccountActivationTest extends TestBase {
         softAssert.assertTrue(isLoggedIn, "User should be redirected away from login page after successful login");
         softAssert.assertAll();
     }
+    @Test(priority = 7)
+    public void regularUserShouldNotSeeAdminTab() {
+        try {
+            webDriver.navigate().to(LoadProperties.env.getProperty("URL"));
+            webDriver.findElement(By.linkText("Logout")).click();
+        } catch (Exception e) {
+            // not logged in, continue
+        }
+        homePage = new HomePage(webDriver);
+        homePage.login(email, password);
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        softAssert.assertTrue(
+            webDriver.findElements(By.linkText("Admin")).isEmpty(),
+        "Admin tab should not be visible to a non-admin user"
+        );
+        softAssert.assertAll();
+    }
 }
