@@ -72,11 +72,14 @@ export async function doPostLogin(url, data) {
 export async function doPostFile(url, token, data) {
   try {
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
+    // Bugfix: the backend expects Content-Type to be multipart/form-data
+    // So wrapping the raw file data inside formData with a consistent field name 'file'.
+    const formData = new FormData()
+    formData.append('file', data)
     const response = await fetch(url, {
       method: 'POST',
       headers,
-      body: data,
+      body: formData,
     });
 
     return handleResponse(response);
@@ -125,9 +128,10 @@ export async function doPostDownload(url, data, token) {
   return handleResponse(response,true);
 }
 
-export async function doGetDownload(url) {
+export async function doGetDownload(url, token) {
   const response = await fetch(url, {
     method: 'GET',
+    headers: { Authorization: `Bearer ${token}`}
   });
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
