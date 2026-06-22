@@ -15,7 +15,7 @@ public abstract class AbstractController {
 
     protected static final String TOTAL_COUNT_HEADER = "X-Total-Count";
     protected static final String TOTAL_PAGES_COUNT_HEADER = "X-Total-Pages";
-    protected static final int DEFAULT_PAGE_SIZE = 20;
+    protected static final int DEFAULT_PAGE_SIZE = 50;
 
     protected Pageable pageOf(final Integer offset, final Integer limit, final Sort sort) {
         final var size = limit == null ? DEFAULT_PAGE_SIZE : limit;
