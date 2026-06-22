@@ -2,6 +2,7 @@ package org.vega.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class HomePage extends PageBase {
     public HomePage(WebDriver webDriver) {
@@ -10,7 +11,7 @@ public class HomePage extends PageBase {
 
    // This defines a locators for a Elements in a webpage.
     By signUpBtn = By.linkText("Sign Up");
-    By loginBtn = By.linkText("Login");
+    public By loginBtn = By.linkText("Login");
     By nameField = By.name("name");
     By emailField = By.name("email");
     By passField = By.name("password");
@@ -21,7 +22,9 @@ public class HomePage extends PageBase {
    By emailLoginField=By.name("email");
    By passwordLoginField=By.name("password");
    By loginSubmitBtn=By.xpath("//button[text()='Login']");
-   By adminPanelModule=By.linkText("Admin");
+   public By adminPanelModule=By.linkText("Admin");
+   public By resourcesNavLink = By.linkText("Resources");
+   By logoutBtn = By.linkText("Logout");
 
 
     //Method to sign up a user with the provided information.
@@ -47,7 +50,10 @@ public class HomePage extends PageBase {
     public void openAdminPanel(){
         click(adminPanelModule);
     }
-    By logoutBtn = By.linkText("Logout");
+
+    public void openResources(){
+        click(resourcesNavLink);
+    }
 
     public void logout() {
         click(logoutBtn);
