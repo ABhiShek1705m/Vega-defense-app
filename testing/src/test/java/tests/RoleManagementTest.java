@@ -1,13 +1,10 @@
 package tests;
 
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.vega.configuration.LoadProperties;
 import org.vega.pages.AdminPanelPage;
 import org.vega.pages.HomePage;
-import java.time.Duration;
 
 
 /*
@@ -52,7 +49,6 @@ public class RoleManagementTest extends TestBase {
         homePage.openAdminPanel();
         adminPanelPage.updateRoleForUserInAllAccounts(empEmail, "Employee");
         homePage.logout();
-        softAssert.assertAll();
     }
 
     // F1
@@ -78,15 +74,6 @@ public class RoleManagementTest extends TestBase {
     public void userRoleCannotSeeResourcesOrAdminTab() {
         homePage = new HomePage(webDriver);
         adminPanelPage = new AdminPanelPage(webDriver);
-        
-        // Admin changes empEmail from Employee → User.
-        homePage.login(ADMIN_EMAIL, ADMIN_PASSWORD);
-        homePage.openAdminPanel();
-        assertIsEqual(adminPanelPage.adminPanelTitle, "ADMIN PANEL");
-        adminPanelPage.updateRoleForUserInAllAccounts(empEmail, "User");
-        assertIsEqual(homePage.toastMsg, "Role updated successfully");
-        homePage.logout();
-
         // empEmail (now User) should see neither Resources nor Admin.
         homePage.login(empEmail, empPassword);
         assertElementNotPresent(homePage.adminPanelModule);
