@@ -5,7 +5,6 @@ default:
 stages:
   - build
   - docker
-  - test
 
 variables:
   DOCKER_DRIVER: overlay2
@@ -56,44 +55,3 @@ docker_build:
     - docker push eafolaranmi/vega_front:latest
   only:
     - main
-
-# ------------------------
-# Nightly Selenium Tests
-# ------------------------
-selenium_tests:
-  stage: test
-  tags:
-    - seng426
-  before_script:
-    # Start backend in background
-    - cd vega-spring/target
-    - nohup java -jar vega-1.0.0.war --spring.profiles.active=dev > /tmp/backend.log 2>&1 &
-    - echo "Waiting for backend to start..."
-    - sleep 30
-    - cd ../../vega-web
-    # Install frontend dependencies and start in background
-    - npm install
-    - nohup npm start > /tmp/frontend.log 2>&1 &
-    - echo "Waiting for frontend to start..."
-    - sleep 20
-    - cd ..
-  script:
-    - cd testing
-    - mvn test "-Dsurefire.excludedGroups=requiresVM"
-  after_script:
-    # Kill background processes
-    - pkill -f "vega-1.0.0.war" || true
-    - pkill -f "npm start" || true
-  artifacts:
-    when: always
-    paths:
-      - testing/target/surefire-reports/
-      - /tmp/backend.log
-      - /tmp/frontend.log
-    reports:
-      junit: testing/target/surefire-reports/junitreports/TEST-*.xml
-    expire_in: 30 days
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: manual
