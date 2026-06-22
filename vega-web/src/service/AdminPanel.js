@@ -1,7 +1,8 @@
 import {doGet, BASE_API_URL,doPut,doPostFile,doGetDownload} from './BaseAPI.js';
 
 export function fetchUsers(token){
-	return doGet(`${BASE_API_URL}/users`, token);
+  // Swapping the default 20 out for a larger limit
+  return doGet(`${BASE_API_URL}/users?limit=500`, token); 
 }
 
 export function enableAccount(userId,token){
