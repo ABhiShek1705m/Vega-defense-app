@@ -62,29 +62,34 @@ docker_build:
 # ------------------------
 selenium_tests:
   stage: test
-  image: maven:3.9.6-eclipse-temurin-17
+  tags:
+    - seng426
   before_script:
-    # Install Chrome and ChromeDriver
-    - apt-get update -qq
-    - apt-get install -y -qq wget gnupg unzip curl
-    - wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
-    - echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
-    - apt-get update -qq
-    - apt-get install -y -qq google-chrome-stable
-    # Pull and start the app via Docker Compose
-    - apt-get install -y -qq docker-compose
-    - echo "$REGISTRY_PASS" | docker login -u "$REGISTRY_USER" --password-stdin
-    - docker-compose -f docker-compose-cd.yml up -d
-    - sleep 30  # wait for backend and DB to be ready
+    # Start backend in background
+    - cd vega-spring/target
+    - nohup java -jar vega-1.0.0.war --spring.profiles.active=dev > /tmp/backend.log 2>&1 &
+    - echo "Waiting for backend to start..."
+    - sleep 30
+    - cd ../../vega-web
+    # Install frontend dependencies and start in background
+    - npm install
+    - nohup npm start > /tmp/frontend.log 2>&1 &
+    - echo "Waiting for frontend to start..."
+    - sleep 20
+    - cd ..
   script:
     - cd testing
-    - mvn test -Dsurefire.excludedGroups="requiresVM"
+    - mvn test "-Dsurefire.excludedGroups=requiresVM"
   after_script:
-    - docker-compose -f docker-compose-cd.yml down
+    # Kill background processes
+    - pkill -f "vega-1.0.0.war" || true
+    - pkill -f "npm start" || true
   artifacts:
     when: always
     paths:
       - testing/target/surefire-reports/
+      - /tmp/backend.log
+      - /tmp/frontend.log
     reports:
       junit: testing/target/surefire-reports/junitreports/TEST-*.xml
     expire_in: 30 days

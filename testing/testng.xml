@@ -7,7 +7,10 @@
         <classes>
             <class name="tests.LoginTest"/>
             <class name="tests.SignUpTest"/>
+            <class name="tests.RoleManagementTest"/>
+            <class name="tests.FileUploadVisibilityTest"/>
             <class name="tests.DefenseAppTest"/>
+            <class name="tests.AccountActivationTest"/>
         </classes>
     </test> -->
 
@@ -23,9 +26,10 @@
         <classes>
             <class name="tests.LoginTest"/>
             <class name="tests.SignUpTest"/>
-            <class name="tests.RoleManagmentTest"/>
+            <class name="tests.RoleManagementTest"/>
             <class name="tests.FileUploadVisibilityTest"/>
             <class name="tests.DefenseAppTest"/>
+            <class name="tests.AccountActivationTest"/>
         </classes>
     </test>
    

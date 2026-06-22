@@ -110,7 +110,8 @@ public class FileUploadVisibilityTest extends TestBase {
     @Test(priority = 3, dependsOnMethods = "adminCanUploadFileFromAdminPanel")
     public void userCannotViewUploadedResources() {
         homePage = new HomePage(webDriver);
-        homePage.login(empEmail, empPassword);
+        homePage.login(LoadProperties.env.getProperty("TEST_USER_EMAIL"), 
+                        LoadProperties.env.getProperty("TEST_USER_PASSWORD"));
         // Assert that the user cannot view the resources tab and access resources.
         assertElementNotPresent(homePage.resourcesNavLink);
         homePage.logout();

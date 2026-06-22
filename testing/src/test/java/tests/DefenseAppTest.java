@@ -351,7 +351,7 @@ public class DefenseAppTest extends TestBase {
      * After uninstalling, the Admin Dashboard should show
      * "No defense application is registered yet."
      */
-    @Test(priority = 11)
+    @Test(priority = 11, groups = {"requiresVM"}, dependsOnMethods = {"shouldUninstallDefenseAppSuccessfully"})
     public void adminShouldSeeNoAppRegisteredAlertInAdminDashboard() {
         HomePage homePage = new HomePage(webDriver);
         DefenseAppPage defenseAppPage = new DefenseAppPage(webDriver);
@@ -378,7 +378,7 @@ public class DefenseAppTest extends TestBase {
      * After uninstalling, the Client Dashboard should show
      * "No defense app is registered for this account."
      */
-    @Test(priority = 12)
+    @Test(priority = 12, groups = {"requiresVM"}, dependsOnMethods = {"shouldUninstallDefenseAppSuccessfully"})
     public void userShouldSeeNoAppRegisteredAlertInClientDashboard() {
         HomePage homePage = new HomePage(webDriver);
         DefenseAppPage defenseAppPage = new DefenseAppPage(webDriver);
