@@ -25,7 +25,9 @@ const Login = () => {
   }
 
     function detectSqlInjection(input = '') {
-      if (!input) return false;
+      if (!input) {
+        return false;
+      }
        const s = input.toLowerCase().replace(/\s+/g, ' ').trim();
 
        return (
