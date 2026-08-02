@@ -18,9 +18,10 @@ public class CustomUserLoginRepository {
     private EntityManager entityManager;
 
     public User findByEmailAndPasswordSQLInj(String email, String password) {
-        String sql = "SELECT * FROM vega.users WHERE email = '" + email + "' AND password = '" + password + "' LIMIT 1";
-
+        String sql = "SELECT * FROM users WHERE email = ?1 AND password = ?2";
         Query query = entityManager.createNativeQuery(sql, User.class);
+        query.setParameter(1, email);
+        query.setParameter(2, password);
 
         try {
             return (User) query.getSingleResult();

@@ -107,14 +107,19 @@ public class FileService {
      * @throws BusinessException 500 if the file couldn't be retrieved from the system;
      * @return the saved file.
      */
-//    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public DownloadFileDto downloadFile(final String filePath) {
-        final var rootLocation = Paths.get(this.FILES_BASIC_FOLDER_PATH);
+        final var rootLocation = Paths.get(this.FILES_BASIC_FOLDER_PATH).toAbsolutePath().normalize();
+
+        final Path resolved = rootLocation.resolve(filePath).normalize();
+        if (!resolved.startsWith(rootLocation)) {
+            throw new BusinessException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    String.format("Could not read file with path: %s", filePath));
+        }
 
         try {
-            final Path file = rootLocation.resolve(filePath);
-            final Resource resource = new UrlResource(file.toUri());
-            if (resource.exists() || resource.isReadable()) {
+            final Resource resource = new UrlResource(resolved.toUri());
+            if (resource.exists() && resource.isReadable()) {
                 return constructDownloadFileEntity(resource);
             } else {
                 throw new BusinessException(HttpStatus.INTERNAL_SERVER_ERROR,
