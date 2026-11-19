@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @Service
@@ -25,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefenseSecStatusService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<Long, Set<WebSocketSession>> sessions = new ConcurrentHashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(DefenseMetricsService.class);
+
 
     private final AppRepository appRepository;
 
@@ -78,7 +82,7 @@ public class DefenseSecStatusService {
                 session.sendMessage(new TextMessage(message));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to send security status update", e);
         }
     }
 

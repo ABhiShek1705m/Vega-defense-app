@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class DefenseMetricsService {
     private final Map<Long, Set<WebSocketSession>> sessions = new ConcurrentHashMap<>();
 
     private final AppRepository appRepository;
+    private static final Logger log = LoggerFactory.getLogger(DefenseMetricsService.class);
 
     /**
      * Registers a WebSocket session for the specified application ID.
@@ -126,7 +129,7 @@ public class DefenseMetricsService {
                 session.sendMessage(new TextMessage(message));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to send metrics update", e);
         }
     }
 

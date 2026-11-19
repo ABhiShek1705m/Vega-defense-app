@@ -48,6 +48,19 @@ public class SecurityConfig {
                         .antMatchers("/api/v1/**")
                         .authenticated()
                 )
+                .headers(headers -> headers.contentSecurityPolicy(csp -> csp
+                    .policyDirectives(
+                        "default-src 'self'; "
+                                + "script-src 'self'; "
+                                + "style-src 'self'; "
+                                + "img-src 'self' data:; "
+                                + "font-src 'self'; "
+                                + "connect-src 'self'; "
+                                + "object-src 'none'; "
+                                + "frame-ancestors 'none'; "
+                                + "base-uri 'self'; "
+                                + "form-action 'self'"
+                    )))
                 .formLogin().disable()
                 .logout().disable()
                 .httpBasic();
