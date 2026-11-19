@@ -1,93 +1,147 @@
-# SENG426_GP16
+# Vega Defense App
 
+A web platform for monitoring network traffic and detecting anomalous (potentially malicious) activity on machines you register with it. It was built originally by the course instructor for **SENG 426** at the University of Victoria which was then evalauated and tested by our group (grp. 16) for the course project.
 
+The platform has three parts:
 
-## Getting started
+| Part | What it is | Tech |
+|------|------------|------|
+| **Web frontend** (`vega-web`) | Public site, login/sign-up, admin panel, and the live *Defense App Dashboard* | React 17, React-Bootstrap, Chart.js |
+| **Backend API** (`vega-spring`) | REST + WebSocket API, authentication, persistence, file hosting | Spring Boot 2.7, Java 17, MySQL 8, Flyway |
+| **Defense agent** (`files/vegaDefenseApp.tar.gz`) | Python agent installed on the machine to be protected; sniffs packets and classifies them | Python 3.10, Scapy, scikit-learn, Flask |
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+An automated Selenium UI test suite lives in `testing/`.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## How it works
 
-## Add your files
+1. A user signs up in the web UI. An **admin** activates the account and assigns a role (`ADMIN`, `EMPLOYEE`, or `USER`).
+2. The user downloads the Defense Agent bundle from the dashboard and installs it on the target machine (see [Installing the defense agent](#installing-the-defense-agent)).
+3. `vega register` registers that machine with the backend (hostname, host IP, network interface). The agent then runs a small Flask server on **port 5000**.
+4. From the dashboard, the user clicks *Start/Stop sniffing* or *Uninstall*. The backend forwards these commands to the agent's Flask server (`/start`, `/stop`, `/uninstall`).
+5. While sniffing, the agent captures raw packets, extracts flow/traffic features, and runs them through a pre-trained scikit-learn model (shipped in the agent wheel) to label traffic as benign or anomalous. Results and features are uploaded to the backend (`POST /api/v1/defenseApp/uploadData`) and stored in MySQL.
+6. The backend pushes live metrics and the machine's security status to the dashboard over **WebSockets** (`/api/v1/ws/defenseClient/Metrics/{appId}` and `/SecStatus/{appId}`).
 
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+Authentication is stateless JWT (Spring Security); roles gate both API endpoints and frontend routes (e.g. `/adminpanel` is admin-only).
+
+## Project structure
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.csc.uvic.ca/courses/2026051/SENG426/assignments/oeafolaranmi/seng426_gp16.git
-git branch -M main
-git push -uf origin main
+Vega-defense-app/
+├── vega-spring/              # Backend (Spring Boot, Maven, WAR)
+│   ├── src/main/java/io/venus/vega/
+│   │   ├── api/v1/           # REST controllers (generated interfaces from api.yaml) + WebSocket handlers
+│   │   ├── services/         # Business logic (users, roles, files, defense app, metrics, sec status)
+│   │   ├── data/             # JPA entities, repositories, DB seeder
+│   │   ├── security/         # JWT filter/generator, Spring Security config
+│   │   └── config/           # WebSocket, JPA auditing, exception handling
+│   ├── src/main/resources/
+│   │   ├── static/api.yaml   # OpenAPI spec – API interfaces/models are generated from this at build time
+│   │   ├── db/migration/     # Flyway SQL migrations
+│   │   └── application*.properties
+│   └── Dockerfile
+├── vega-web/                 # Frontend (React, Create React App)
+│   ├── src/components/       # Atomic-design UI: atoms → molecules → organisms → templates → pages
+│   ├── src/service/          # API clients (login, admin, defense app, …)
+│   ├── src/auth/             # Auth provider and role-protected routes
+│   └── Dockerfile
+├── files/vegaDefenseApp.tar.gz  # Defense agent bundle (Python wheel + installer), served to users for download
+├── testing/                  # Selenium + TestNG end-to-end tests (Maven)
+├── docker-compose.yml        # Local build-from-source stack (frontend + backend; MySQL is commented out)
+├── docker-compose-cd.yml     # Stack using pre-built Docker Hub images, includes MySQL
+└── .gitlab-ci.yml            # Legacy CI from the original GitLab repo (build + Docker push)
 ```
 
-## Integrate with your tools
+## Prerequisites
 
-* [Set up project integrations](https://gitlab.csc.uvic.ca/courses/2026051/SENG426/assignments/oeafolaranmi/seng426_gp16/-/settings/integrations)
+- **Java 17** and **Maven 3.8+** (the backend also ships `mvnw`)
+- **Node.js 16** and npm (the Dockerfile and CI use Node 16)
+- **MySQL 8** (or Docker to run it)
+- **Docker + Docker Compose** (optional, for the containerized setup)
+- A **Linux machine/VM** with root access for the defense agent (raw packet capture)
 
-## Collaborate with your team
+## Build and run
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+### Option A: Docker Compose (recommended)
 
-## Test and Deploy
+`docker-compose.yml` expects a MySQL host named `mysql`, but that service is commented out. Pick one:
+- **Build from source:** in `docker-compose.yml`, make the backend's `SPRING_DATASOURCE_PASSWORD` match `MYSQL_ROOT_PASSWORD`. Then run `docker compose up --build` from project root.
+- **With bundled MySQL (pre-built images):** `docker compose -f docker-compose-cd.yml up -d`. This pulls the images published by the original team (`eafolaranmi/vega_back`, `eafolaranmi/vega_front`), (note that this may be out of date relative to this repo).
 
-Use the built-in continuous integration in GitLab.
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
+Before building the frontend, set the backend URL in the configuration. The stack serves the frontend on <http://localhost:3000> (port 80 in `docker-compose-cd.yml`) and the API on <http://localhost:8080>.
 
-***
+### Option B: Run locally
 
-# Editing this README
+**1. Database**: create an empty `vega` database. Flyway creates all tables on first start.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+```bash
+mysql -u root -p -e "CREATE DATABASE vega;"
+```
 
-## Suggestions for a good README
+**2. Backend**: the default profile connects to `localhost:3306` as `root`; change the credentials in `vega-spring/src/main/resources/application.properties` (or override with `SPRING_DATASOURCE_*` environment variables) to match your MySQL.
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+```bash
+cd vega-spring
+mvn clean package -DskipTests        # produces target/vega-1.0.0.war
+cd ..
+java -jar vega-spring/target/vega-1.0.0.war
+```
 
-## Name
-Choose a self-explaining name for your project.
+Run it from the repository root: the default `defense.app.path=./files/vegaDefenseApp.tar.gz` and `files.basic-folder-path=./uploads` are relative to the working directory. The API listens on <http://localhost:8080/api/v1>.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+**3. Frontend**
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+```bash
+cd vega-web
+npm install
+npm start                            # http://localhost:3000
+```
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+`npm run build` creates a production bundle in `vega-web/build/`.
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### First login
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+On first start the backend seeds a few accounts (see `DatabaseSeeder.java`), including an admin: `Admin@vega.com` / `123456` (configurable via `main-account.*` in `application.properties`). **These are development defaults; change them before exposing the app anywhere.**
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### Installing the defense agent
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+Extract `files/vegaDefenseApp.tar.gz` (or download it from the dashboard) on a Linux machine. It contains a Python 3.10 source tarball, the `vega-0.1.0` wheel, `install.sh`, and its own README.
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+```bash
+./install.sh                          # builds a local Python 3.10, creates a venv, installs the wheel, grants packet-capture capability
+source vegaApp/bin/activate
+vega register --email <your-vega-email> --password '<password>' --ip <backend-server-ip>
+vega-api                              # starts the agent's Flask server (port 5000)
+```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+After this, start/stop sniffing and uninstall from the web dashboard. The backend must be able to reach the agent on port 5000, and the agent must be able to reach the backend on port 8080.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+### Running the tests
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+| Suite | Command |
+|-------|---------|
+| Backend unit tests | `cd vega-spring && mvn test` (requires a running MySQL) |
+| Frontend tests | `cd vega-web && npm test` |
+| End-to-end (Selenium/TestNG) | `cd testing && mvn test` |
 
-## License
-For open source projects, say how it is licensed.
+The end-to-end suite drives a real browser (Chrome via WebDriverManager) against a running stack. Set the target URL, accounts, and agent settings in `testing/.env`. `testing/testng.xml` selects the suite: by default it excludes tests tagged `requiresVM` (start/stop/uninstall of a live agent); switch to the first block when a VM with the agent is running.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Notes on this repository
+
+- This repository was imported from the university GitLab. `.gitlab-ci.yml` and the Docker Hub image names still reflect the original setup and may not work from GitHub as-is.
+- `vega-web/README.md` is a leftover from the original template and describes an Express server that is not part of this repo.
+
+## References and citations
+
+**Frameworks and libraries**
+- Spring Boot, Spring Security, Spring Data JPA: <https://spring.io/projects/spring-boot>
+- Flyway database migrations: <https://flywaydb.org/>
+- OpenAPI Generator (API code generation from `api.yaml`): <https://openapi-generator.tech/>
+- MapStruct and Project Lombok: <https://mapstruct.org/>, <https://projectlombok.org/>
+- JJWT (JSON Web Tokens for Java): <https://github.com/jwtk/jjwt>
+- React: <https://react.dev/>; React-Bootstrap: <https://react-bootstrap.github.io/>; Chart.js: <https://www.chartjs.org/>
+- Selenium and TestNG: <https://www.selenium.dev/>, <https://testng.org/>
+- Scapy (packet capture/parsing): <https://scapy.net/>; scikit-learn (classification model): Pedregosa et al., "Scikit-learn: Machine Learning in Python," *Journal of Machine Learning Research* 12 (2011), 2825–2830.
+
+**Course**
+- SENG 426, University of Victoria (Group 16 course project). The application originated as a GitLab course repository (`seng426_gp16`), which this repository was imported from.
